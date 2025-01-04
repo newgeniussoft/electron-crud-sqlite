@@ -21,8 +21,9 @@ function createWindow() {
     height: 800,
     frame: false, // Remove default frame
     webPreferences: {
-      nodeIntegration: true,
-      contextIsolation: false
+      nodeIntegration: false,
+      contextIsolation: true,
+      preload: path.join(__dirname, 'preload.js')
     }
   });
 
@@ -50,7 +51,7 @@ ipcMain.on('minimize-window', () => {
 
 ipcMain.on('maximize-window', () => {
   if (mainWindow.isMaximized()) {
-    mainWindow.unmaximize();
+    mainWindow.restore();
   } else {
     mainWindow.maximize();
   }
@@ -61,42 +62,48 @@ ipcMain.on('close-window', () => {
 });
 
 // CRUD Operations
-ipcMain.handle('create-item', async (event, item) => {
+ipcMain.handle('get-items', () => {
   return new Promise((resolve, reject) => {
-    db.run('INSERT INTO items (title, description) VALUES (?, ?)', 
-      [item.title, item.description], 
-      function(err) {
-        if (err) reject(err);
-        resolve(this.lastID);
-      });
-  });
-});
-
-ipcMain.handle('get-items', async () => {
-  return new Promise((resolve, reject) => {
-    db.all('SELECT * FROM items ORDER BY created_at DESC', [], (err, rows) => {
+    db.all('SELECT * FROM items ORDER BY created_at DESC', (err, rows) => {
       if (err) reject(err);
-      resolve(rows);
+      else resolve(rows);
     });
   });
 });
 
-ipcMain.handle('update-item', async (event, item) => {
+ipcMain.handle('create-item', (event, item) => {
   return new Promise((resolve, reject) => {
-    db.run('UPDATE items SET title = ?, description = ? WHERE id = ?',
-      [item.title, item.description, item.id],
-      (err) => {
+    const { title, description } = item;
+    db.run(
+      'INSERT INTO items (title, description) VALUES (?, ?)',
+      [title, description],
+      function(err) {
         if (err) reject(err);
-        resolve(true);
-      });
+        else resolve({ id: this.lastID, title, description });
+      }
+    );
   });
 });
 
-ipcMain.handle('delete-item', async (event, id) => {
+ipcMain.handle('update-item', (event, item) => {
+  return new Promise((resolve, reject) => {
+    const { id, title, description } = item;
+    db.run(
+      'UPDATE items SET title = ?, description = ? WHERE id = ?',
+      [title, description, id],
+      (err) => {
+        if (err) reject(err);
+        else resolve({ id, title, description });
+      }
+    );
+  });
+});
+
+ipcMain.handle('delete-item', (event, id) => {
   return new Promise((resolve, reject) => {
     db.run('DELETE FROM items WHERE id = ?', [id], (err) => {
       if (err) reject(err);
-      resolve(true);
+      else resolve(id);
     });
   });
 });
