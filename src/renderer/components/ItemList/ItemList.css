@@ -1,0 +1,58 @@
+.items-container {
+  margin-top: 30px;
+}
+
+.items-container h2 {
+  color: #333;
+  margin-bottom: 20px;
+}
+
+.item {
+  border: 1px solid #ddd;
+  padding: 15px;
+  margin-bottom: 10px;
+  border-radius: 4px;
+  background-color: white;
+}
+
+.item h3 {
+  margin: 0 0 10px 0;
+  color: #333;
+}
+
+.item p {
+  margin: 0;
+  color: #666;
+}
+
+.item-actions {
+  margin-top: 10px;
+  display: flex;
+  gap: 10px;
+}
+
+.btn-edit {
+  background-color: #2196F3;
+  color: white;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.btn-delete {
+  background-color: #f44336;
+  color: white;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.btn-edit:hover {
+  background-color: #1976D2;
+}
+
+.btn-delete:hover {
+  background-color: #D32F2F;
+}
