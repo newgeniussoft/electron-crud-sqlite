@@ -17,3 +17,15 @@ This is a basic Electron application configured to run on Windows 7.
 ## Notes
 - This application uses Electron 11.5.0, which is the last version that supports Windows 7
 - Node integration is enabled for compatibility reasons
+
+## Convert to exe
+Library must installed like this
+```bash
+npm install <library-name> --save
+```
+
+This is the installation command of electron-packager for converting to exe and the usage is like this
+```bash
+npm install --save-dev electron-packager
+npx electron-packager ./my-app MyApp --platform=win32 --arch=x64 --out=dist
+```

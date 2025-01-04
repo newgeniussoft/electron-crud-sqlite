@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>CRUD App</title>
+    <title>CRUD App with Custom Title Bar</title>
     <style>
         * {
             margin: 0;
@@ -9,10 +9,66 @@
             box-sizing: border-box;
             font-family: Arial, sans-serif;
         }
+
         body {
-            padding: 20px;
             background-color: #f5f5f5;
+            overflow: hidden;
         }
+
+        #titlebar {
+            height: 32px;
+            background: #2c2c2c;
+            color: #FFF;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 8px;
+            -webkit-app-region: drag;
+        }
+
+        .titlebar-title {
+            font-size: 14px;
+            margin-left: 8px;
+        }
+
+        .titlebar-buttons {
+            display: flex;
+            -webkit-app-region: no-drag;
+        }
+
+        .titlebar-button {
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            width: 32px;
+            height: 32px;
+            border: none;
+            background: transparent;
+            outline: none;
+            cursor: pointer;
+            color: #fff;
+            transition: background-color 0.2s;
+        }
+
+        .titlebar-button:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        #close-button:hover {
+            background: #e81123;
+        }
+
+        .icon {
+            font-family: "Segoe MDL2 Assets", "Segoe UI Symbol";
+            font-size: 10px;
+        }
+
+        .content {
+            padding: 20px;
+            height: calc(100vh - 32px);
+            overflow-y: auto;
+        }
+
         .container {
             max-width: 1000px;
             margin: 0 auto;
@@ -21,13 +77,16 @@
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
+
         h1 {
             color: #333;
             margin-bottom: 20px;
         }
+
         .form-group {
             margin-bottom: 15px;
         }
+
         input, textarea {
             width: 100%;
             padding: 8px;
@@ -35,6 +94,7 @@
             border-radius: 4px;
             margin-top: 5px;
         }
+
         button {
             background-color: #4CAF50;
             color: white;
@@ -44,9 +104,11 @@
             cursor: pointer;
             margin-right: 10px;
         }
+
         button:hover {
             background-color: #45a049;
         }
+
         .item {
             border: 1px solid #ddd;
             padding: 15px;
@@ -54,39 +116,60 @@
             border-radius: 4px;
             background-color: white;
         }
+
         .item-actions {
             margin-top: 10px;
         }
+
         .btn-edit {
             background-color: #2196F3;
         }
+
         .btn-delete {
             background-color: #f44336;
         }
+
         .items-container {
             margin-top: 30px;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>CRUD Application</h1>
-        
-        <div id="itemForm">
-            <div class="form-group">
-                <label for="title">Title:</label>
-                <input type="text" id="title" required>
-            </div>
-            <div class="form-group">
-                <label for="description">Description:</label>
-                <textarea id="description" rows="3"></textarea>
-            </div>
-            <button onclick="saveItem()" id="saveBtn">Add Item</button>
+    <div id="titlebar">
+        <div class="titlebar-title">CRUD App with Custom Title Bar</div>
+        <div class="titlebar-buttons">
+            <button class="titlebar-button" id="minimize-button">
+                <span class="icon">&#xE921;</span>
+            </button>
+            <button class="titlebar-button" id="maximize-button">
+                <span class="icon">&#xE922;</span>
+            </button>
+            <button class="titlebar-button" id="close-button">
+                <span class="icon">&#xE8BB;</span>
+            </button>
         </div>
+    </div>
 
-        <div class="items-container">
-            <h2>Items</h2>
-            <div id="itemsList"></div>
+    <div class="content">
+        <div class="container">
+            <h1>Item Management</h1>
+            
+            <div id="itemForm">
+                <div class="form-group">
+                    <label for="title">Title:</label>
+                    <input type="text" id="title" required>
+                </div>
+                <div class="form-group">
+                    <label for="description">Description:</label>
+                    <textarea id="description" rows="3"></textarea>
+                </div>
+                <button onclick="saveItem()" id="saveBtn">Add Item</button>
+            </div>
+
+            <div class="items-container">
+                <h2>Items</h2>
+                <div id="itemsList"></div>
+            </div>
         </div>
     </div>
 
@@ -94,6 +177,30 @@
         const { ipcRenderer } = require('electron');
         let editingId = null;
 
+        // Window control
+        document.getElementById('minimize-button').addEventListener('click', () => {
+            ipcRenderer.send('minimize-window');
+        });
+
+        document.getElementById('maximize-button').addEventListener('click', () => {
+            ipcRenderer.send('maximize-window');
+        });
+
+        document.getElementById('close-button').addEventListener('click', () => {
+            ipcRenderer.send('close-window');
+        });
+
+        // Update maximize/restore button
+        window.addEventListener('resize', () => {
+            const maximizeButton = document.getElementById('maximize-button');
+            if (window.outerWidth === screen.availWidth && window.outerHeight === screen.availHeight) {
+                maximizeButton.querySelector('.icon').innerHTML = '&#xE923;'; // Restore icon
+            } else {
+                maximizeButton.querySelector('.icon').innerHTML = '&#xE922;'; // Maximize icon
+            }
+        });
+
+        // CRUD Operations
         async function loadItems() {
             const items = await ipcRenderer.invoke('get-items');
             const itemsList = document.getElementById('itemsList');
