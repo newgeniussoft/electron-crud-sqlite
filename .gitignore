@@ -46,6 +46,10 @@ coverage/
 ehthumbs.db
 Thumbs.db
 
+# SQLite database
+*.db
+
+
 # Electron specific
 .electron-builder.env
 
