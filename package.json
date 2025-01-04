@@ -1,7 +1,7 @@
 {
-  "name": "electron-win7",
+  "name": "electron-crud-app",
   "version": "1.0.0",
-  "description": "Electron application compatible with Windows 7",
+  "description": "Electron CRUD application with SQLite",
   "main": "main.js",
   "scripts": {
     "start": "electron .",
@@ -9,6 +9,9 @@
   },
   "author": "",
   "license": "ISC",
+  "dependencies": {
+    "sqlite3": "^5.1.6"
+  },
   "devDependencies": {
     "electron": "^11.5.0"
   }
